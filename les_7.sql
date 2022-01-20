@@ -19,7 +19,7 @@ ON u.id = o.user_id
 SELECT 
 	p.id , p.name , p.price , c.name 
 FROM products p 
-JOIN catalogs c 
+LEFT JOIN catalogs c 
 ON p.catalog_id = c.id 
 
 
