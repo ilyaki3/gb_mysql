@@ -5,52 +5,17 @@ USE vk;
  * Из всех друзей этого пользователя найдите человека, который больше всех общался с нашим пользователем.
  */
 
--- решение через все сообщения между пользователями,
--- но не понимаю как объединить их в общее колличество сообщений между двумя пользователями
 
-SELECT from_user_id , to_user_id , count(*) AS send FROM messages 
-WHERE 
-	(from_user_id = 1 OR to_user_id = 1) 
-	AND 
-		(from_user_id IN (
-			SELECT initiator_user_id AS friends FROM friend_requests
-			WHERE status = 'approved' AND target_user_id = 1
-			UNION ALL 
-			SELECT target_user_id FROM friend_requests
-			WHERE status = 'approved' AND initiator_user_id = 1)
-			
-		OR 
-		to_user_id IN (
-			SELECT initiator_user_id AS friends FROM friend_requests
-			WHERE status = 'approved' AND target_user_id = 1
-			UNION ALL 
-			SELECT target_user_id FROM friend_requests
-			WHERE status = 'approved' AND initiator_user_id = 1))
-
-GROUP BY to_user_id, from_user_id
-ORDER BY send DESC;
-
-
--- решение через пользователя, который прислал нам больше всего сообщений
 
 SELECT from_user_id, count(*) AS send FROM messages 
 WHERE 
-	to_user_id = 1
-	AND 
-		(from_user_id IN (
-			SELECT initiator_user_id AS friends FROM friend_requests
-			WHERE status = 'approved' AND target_user_id = 1
-			UNION ALL 
-			SELECT target_user_id FROM friend_requests
-			WHERE status = 'approved' AND initiator_user_id = 1)
-			
-		OR 
-		to_user_id IN (
-			SELECT initiator_user_id AS friends FROM friend_requests
-			WHERE status = 'approved' AND target_user_id = 1
-			UNION ALL 
-			SELECT target_user_id FROM friend_requests
-			WHERE status = 'approved' AND initiator_user_id = 1))
+	to_user_id = 1	AND from_user_id IN (
+		SELECT initiator_user_id AS friends FROM friend_requests
+		WHERE status = 'approved' AND target_user_id = 1
+		UNION ALL 
+		SELECT target_user_id FROM friend_requests
+		WHERE status = 'approved' AND initiator_user_id = 1)
+
 
 GROUP BY from_user_id 
 ORDER BY send DESC 
