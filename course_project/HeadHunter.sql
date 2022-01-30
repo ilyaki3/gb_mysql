@@ -1,6 +1,4 @@
 
-
-
 DROP DATABASE IF EXISTS head_hunter;
 CREATE DATABASE head_hunter;
 USE head_hunter;
@@ -150,6 +148,50 @@ CREATE TABLE `invintations`(
 	FOREIGN KEY (vacancy_id) REFERENCES vacancy(id) ON UPDATE CASCADE ON DELETE CASCADE,
 	FOREIGN KEY (message_id) REFERENCES messages(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+
+
+
+
+
+
+-- Представление информации о пользователе
+CREATE OR REPLACE VIEW user_info AS 
+SELECT  
+	u.name AS 'Имя', 
+	u.surname AS 'Фамилия', 
+	up.country AS 'Страна', 
+	up.city AS 'Город', 
+	up.nationality AS 'Гражданство',
+	up.birth_date AS 'Дата рождения'
+FROM users u  
+JOIN user_profile up ON u.id = up.user_id 
+
+
+-- Представление для поиска откликов на резюме пользователя
+CREATE OR REPLACE VIEW my_invintations_from_companies AS 
+SELECT 
+	r.user_id,
+	r.title AS 'Вакансия', 
+	c.company_name  AS 'Название компании',
+	m.body AS 'Сообщение',
+	i.inventation_date AS 'Дата отклика'
+FROM resume r  
+JOIN invintations i ON r.id = i.resume_id  AND i.`from` = 'c'  
+JOIN companies c ON c.id = i.company_id 
+JOIN messages m ON m.user_id  = r.user_id AND m.company_id = c.id AND m.sender = 'c'
+ORDER BY i.inventation_date DESC 
+
+-- SELECT *
+-- FROM my_invintations_from_companies 
+-- WHERE user_id = 22
+
+
+
+
+
+
+
 
 
 
