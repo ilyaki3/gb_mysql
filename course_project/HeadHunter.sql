@@ -189,12 +189,68 @@ ORDER BY i.inventation_date DESC
 
 
 
+-- Триггер для неверной даты рождения (можно работать с 16 лет)
+DROP TRIGGER IF EXISTS wrong_birth_date;
+delimiter //
+CREATE TRIGGER wrong_birth_date BEFORE INSERT ON user_profile  
+FOR EACH ROW 
+BEGIN 
+	IF YEAR(now()) - YEAR ('2022-01-31 19:31:54') < YEAR ('0016-00-00 00:00:00') THEN 
+		SIGNAL SQLSTATE '45000' SET message_text = 'wrong date, you must be over 16';
+	END IF;
+END//
+delimiter ;
 
 
 
 
 
+-- Процедура для установки метки удален для пользователя,
+-- сокрытия его резюме и фото
+DROP PROCEDURE IF EXISTS set_profile_deleted;
+DELIMITER //
+//
+CREATE PROCEDURE set_profile_deleted (
+IN deleting_user_id bigint UNSIGNED)
 
+BEGIN
+	DECLARE `_rollback` BIT DEFAULT 0;
+	DECLARE code varchar(100);
+	DECLARE error_string varchar(100); 
+	DECLARE tran_result varchar(100);
+
+	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+	BEGIN
+ 		SET `_rollback` = 1;
+ 		GET stacked DIAGNOSTICS CONDITION 1
+			code = RETURNED_SQLSTATE, error_string = MESSAGE_TEXT;
+		SET tran_result = concat('Ошибка: ', code, ' Текст ошибки: ', error_string);
+	END;
+
+	START TRANSACTION;
+		UPDATE users 
+		SET is_deleted = 1
+		WHERE users.id = deleting_user_id; 
+	
+		UPDATE user_resumes 
+		SET is_visible = 0
+		WHERE user_id  = deleting_user_id;
+	
+		UPDATE photos  
+		SET is_visible = 0
+		WHERE user_id = deleting_user_id;
+	
+	IF `_rollback` THEN
+		SET tran_result = 'ROLLBACK';
+		ROLLBACK;
+	ELSE
+		SET tran_result = 'user marked as deleted';
+		COMMIT;
+	END IF;
+END//
+delimiter ;
+
+-- CALL set_profile_deleted (4)
 
 
 
