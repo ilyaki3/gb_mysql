@@ -64,7 +64,7 @@ CREATE TABLE `resume`(
 
 DROP TABLE IF EXISTS `user_resumes`;
 CREATE TABLE `user_resumes`(
-	`resume_id` bigint UNSIGNED NOT NULL,
+	`resume_id` serial PRIMARY KEY,
 	`user_id` bigint UNSIGNED NOT NULL,
 	`created_at` timestamp DEFAULT now(),
 	`updated_at` timestamp DEFAULT now() ON UPDATE now(),
@@ -166,7 +166,7 @@ SELECT
 	up.nationality AS 'Гражданство',
 	up.birth_date AS 'Дата рождения'
 FROM users u  
-JOIN user_profile up ON u.id = up.user_id 
+JOIN user_profile up ON u.id = up.user_id; 
 
 
 -- Представление для поиска откликов на резюме пользователя
@@ -181,7 +181,7 @@ FROM resume r
 JOIN invintations i ON r.id = i.resume_id  AND i.`from` = 'c'  
 JOIN companies c ON c.id = i.company_id 
 JOIN messages m ON m.user_id  = r.user_id AND m.company_id = c.id AND m.sender = 'c'
-ORDER BY i.inventation_date DESC 
+ORDER BY i.inventation_date DESC;
 
 -- SELECT *
 -- FROM my_invintations_from_companies 
