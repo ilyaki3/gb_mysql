@@ -31,7 +31,7 @@ CREATE TABLE `photos`(
 
 DROP TABLE IF EXISTS `user_profile`;
 CREATE TABLE `user_profile`(
-	`user_id` bigint UNSIGNED NOT NULL,
+	`user_id` serial PRIMARY KEY,
 	`gender` char(1), 
 	`country` varchar (100),
 	`city` varchar (100),
@@ -107,7 +107,7 @@ CREATE TABLE `vacancy`(
 
 DROP TABLE IF EXISTS `vacancies`;
 CREATE TABLE `vacancies`(
-	`vacancy_id` bigint UNSIGNED NOT NULL,
+	`vacancy_id` serial PRIMARY KEY,
 	`company_id` bigint UNSIGNED NOT NULL,
 	`created_at` timestamp DEFAULT now(),
 	`updated_at` timestamp ON UPDATE now(),
@@ -136,6 +136,7 @@ CREATE TABLE `messages`(
 
 DROP TABLE IF EXISTS `invintations`;
 CREATE TABLE `invintations`(
+	`id` serial PRIMARY KEY,
 	`resume_id` bigint UNSIGNED NOT NULL,
 	`company_id` bigint UNSIGNED NOT NULL,
 	`vacancy_id` bigint UNSIGNED NOT NULL,
